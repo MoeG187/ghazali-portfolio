@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tawakkalna at Scale &mdash; Case Study &middot; Mohammad Ghazali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0b09;
+    --bg-2:#131210;
+    --fg:#ece9e2;
+    --fg-dim:rgba(236,233,226,.55);
+    --fg-mute:rgba(236,233,226,.32);
+    --line:rgba(236,233,226,.12);
+    --accent:#d4ff3a;
+    --accent-fg:#0c0b09;
+    --display:"Helvetica Neue","Helvetica","Inter","Arial",sans-serif;
+    --serif:"Instrument Serif","Times New Roman",serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --motion:1;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+    font-family:var(--display);font-weight:500;
+    -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
+    overflow-x:hidden}
+  body{cursor:none}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--accent);color:var(--accent-fg)}
+  .mono{font-family:var(--mono);font-weight:400;letter-spacing:-.01em}
+
+  /* film grain */
+  .grain{position:fixed;inset:-50%;pointer-events:none;z-index:9999;opacity:.06;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation:grain 2.4s steps(6) infinite}
+  @keyframes grain{
+    0%{transform:translate(0,0)} 20%{transform:translate(-3%,2%)}
+    40%{transform:translate(2%,-3%)} 60%{transform:translate(-2%,1%)}
+    80%{transform:translate(3%,2%)} 100%{transform:translate(0,0)}
+  }
+  .vignette{position:fixed;inset:0;pointer-events:none;z-index:9998;
+    background:radial-gradient(120% 80% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%)}
+
+  /* cursor */
+  .cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:10000;
+    will-change:transform;mix-blend-mode:difference}
+  .cursor-dot{width:6px;height:6px;border-radius:50%;background:#fff;
+    transform:translate(-50%,-50%)}
+  .cursor-ring{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.7);
+    transform:translate(-50%,-50%);transition:width .25s ease, height .25s ease, border-color .25s ease, background .25s ease}
+  .cursor-ring.hov{width:64px;height:64px;border-color:transparent;background:var(--accent);mix-blend-mode:normal}
+  @media (pointer:coarse){body{cursor:auto}.cursor-dot,.cursor-ring{display:none}}
+
+  /* nav */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:50;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:18px 28px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.02em;color:var(--fg-dim);
+    background:linear-gradient(to bottom,rgba(12,11,9,.85),rgba(12,11,9,0));
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .nav .left .badge{display:inline-flex;align-items:center;gap:8px;color:var(--fg)}
+  .nav .left .badge .sq{width:6px;height:6px;background:var(--accent)}
+  .nav .center{display:flex;gap:22px;justify-content:center}
+  .nav .center a{color:var(--fg-dim);transition:color .2s}
+  .nav .center a:hover{color:var(--fg)}
+  .nav .right{justify-self:end;display:flex;gap:18px;align-items:center}
+  .nav .right .back{display:inline-flex;align-items:center;gap:8px;color:var(--fg);transition:gap .25s}
+  .nav .right .back:hover{gap:12px}
+
+  section{padding:0 28px}
+
+  /* HERO */
+  .hero{padding-top:140px;padding-bottom:60px;border-bottom:1px solid var(--line)}
+  .meta-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;
+    font-family:var(--mono);font-size:11px;color:var(--fg-dim);
+    text-transform:uppercase;letter-spacing:.14em;margin-bottom:80px}
+  .meta-row .r{justify-self:end}
+  .meta-row .c{justify-self:center}
+
+  .eyebrow{font-family:var(--mono);font-size:11px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:.18em;display:inline-flex;align-items:center;gap:10px;
+    margin-bottom:32px}
+  .eyebrow::before{content:"";width:24px;height:1px;background:var(--accent)}
+
+  .hero h1{font-family:var(--display);font-weight:500;
+    font-size:clamp(64px,11vw,180px);line-height:.86;letter-spacing:-.04em;margin:0 0 32px}
+  .hero h1 em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--fg-dim)}
+  .hero .sub{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:clamp(24px,3vw,40px);line-height:1.2;color:var(--fg-dim);
+    margin:0 0 80px;max-width:32ch}
+
+  .meta-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    border:1px solid var(--line);border-radius:4px}
+  .meta-strip > div{padding:24px;border-right:1px solid var(--line)}
+  .meta-strip > div:last-child{border-right:0}
+  .meta-strip .k{font-family:var(--mono);font-size:10px;color:var(--fg-mute);
+    text-transform:uppercase;letter-spacing:.18em;margin-bottom:14px}
+  .meta-strip .v{font-family:var(--display);font-size:18px;font-weight:500;letter-spacing:-.01em;line-height:1.25;text-wrap:pretty}
+  .meta-strip .v em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--fg-dim)}
+
+  /* lead */
+  .lead{padding:120px 28px 100px;max-width:1100px}
+  .lead p{font-family:var(--display);font-weight:400;
+    font-size:clamp(28px,3.6vw,48px);line-height:1.2;letter-spacing:-.02em;margin:0;text-wrap:pretty}
+  .lead p em{font-family:var(--serif);font-style:italic;color:var(--fg)}
+
+  /* impact */
+  .impact{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:0 28px 120px;
+    border:1px solid var(--line);border-radius:4px}
+  .impact > div{padding:42px 32px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+  .impact > div:last-child{border-right:0}
+  .impact .lab{font-family:var(--mono);font-size:10px;color:var(--fg-mute);
+    text-transform:uppercase;letter-spacing:.18em}
+  .impact .num{font-family:var(--display);font-weight:500;
+    font-size:clamp(48px,6vw,88px);line-height:1;letter-spacing:-.04em;color:var(--fg)}
+  .impact .acid .num{color:var(--accent)}
+  .impact .desc{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--fg-dim);line-height:1.4;margin-top:auto;text-wrap:pretty}
+
+  /* section block U+2014 sticky eyebrow + body */
+  .block{display:grid;grid-template-columns:240px 1fr;gap:80px;
+    padding:80px 28px;border-top:1px solid var(--line)}
+  .block .side{align-self:start;font-family:var(--mono);font-size:11px;
+    color:var(--fg-dim);text-transform:uppercase;letter-spacing:.18em;
+    display:flex;flex-direction:column;gap:8px}
+  .block .side .num{color:var(--accent)}
+  .block .body{max-width:780px}
+  .block h2{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:clamp(32px,4vw,56px);line-height:1.05;letter-spacing:-.01em;margin:0 0 28px;color:var(--fg);text-wrap:pretty}
+  .block .body p{font-family:var(--display);font-weight:400;
+    font-size:18px;line-height:1.55;color:var(--fg-dim);margin:0 0 18px;text-wrap:pretty}
+  .block .body p strong{color:var(--fg);font-weight:500}
+
+  /* arrowed bullets */
+  .arrows{list-style:none;padding:0;margin:32px 0 0;display:flex;flex-direction:column;gap:14px}
+  .arrows li{position:relative;padding-left:30px;font-size:18px;line-height:1.5;color:var(--fg);text-wrap:pretty}
+  .arrows li::before{content:"\2192";position:absolute;left:0;top:.05em;color:var(--accent);font-family:var(--mono);font-size:18px}
+  .arrows li em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--fg-dim)}
+
+  /* PROCESS flow */
+  .process{padding:100px 28px;border-top:1px solid var(--line)}
+  .process-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:48px;flex-wrap:wrap;gap:16px}
+  .process-head h3{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:clamp(28px,3.4vw,44px);margin:0;letter-spacing:-.01em}
+  .process-head .label{font-family:var(--mono);font-size:11px;color:var(--fg-dim);
+    text-transform:uppercase;letter-spacing:.18em}
+
+  .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:0;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .step{padding:28px 18px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:18px;position:relative}
+  .step:last-child{border-right:0}
+  .step .n{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.14em}
+  .step .t{font-family:var(--display);font-weight:500;font-size:16px;line-height:1.25;letter-spacing:-.01em;text-wrap:pretty}
+  .step::after{content:"\2192";position:absolute;right:-9px;top:50%;transform:translateY(-50%);
+    font-family:var(--mono);font-size:14px;color:var(--fg-mute);
+    background:var(--bg);padding:0 4px;line-height:1}
+  .step:last-child::after{display:none}
+
+  /* INSIGHTS */
+  .insights{background:var(--bg-2);padding:120px 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .insights-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:64px;flex-wrap:wrap;gap:16px}
+  .insights-head h3{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:clamp(28px,3.4vw,44px);margin:0;letter-spacing:-.01em}
+  .insights-head .label{font-family:var(--mono);font-size:11px;color:var(--fg-dim);
+    text-transform:uppercase;letter-spacing:.18em}
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+  .quote{display:flex;flex-direction:column;gap:18px;border-top:1px solid var(--line);padding-top:24px}
+  .quote .n{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.14em}
+  .quote p{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:clamp(22px,2vw,30px);line-height:1.25;color:var(--fg);margin:0;text-wrap:pretty}
+
+  /* role / team / timeline closer */
+  .closer{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:120px 28px;
+    border:1px solid var(--line);border-radius:4px}
+  .closer > div{padding:42px 32px;border-right:1px solid var(--line)}
+  .closer > div:last-child{border-right:0}
+  .closer .k{font-family:var(--mono);font-size:10px;color:var(--fg-mute);
+    text-transform:uppercase;letter-spacing:.18em;margin-bottom:18px}
+  .closer .v{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1.25;text-wrap:pretty}
+  .closer .v em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--fg-dim)}
+
+  /* pagination */
+  .pager{display:grid;grid-template-columns:1fr 1fr;gap:24px;
+    padding:80px 28px;border-top:1px solid var(--line)}
+  .pager a{display:flex;flex-direction:column;gap:14px;padding:36px 32px;
+    border:1px solid var(--line);border-radius:4px;
+    transition:background .25s, border-color .25s, transform .35s cubic-bezier(.2,.7,.2,1)}
+  .pager a:hover{background:var(--bg-2);border-color:rgba(212,255,58,.3)}
+  .pager a:hover .arr{color:var(--accent);transform:translateX(6px)}
+  .pager .lab{font-family:var(--mono);font-size:11px;color:var(--fg-dim);
+    text-transform:uppercase;letter-spacing:.18em;display:flex;align-items:center;gap:8px}
+  .pager .arr{color:var(--fg-mute);transition:color .25s, transform .35s cubic-bezier(.2,.7,.2,1)}
+  .pager .ttl{font-family:var(--display);font-size:clamp(28px,3vw,42px);font-weight:500;letter-spacing:-.02em;line-height:1.05;text-wrap:pretty}
+  .pager .ttl em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--fg-dim)}
+  .pager .right{text-align:right;align-items:flex-end}
+  .pager .right:hover .arr{transform:translateX(-6px) rotate(0)}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:32px 28px 28px;
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;
+    font-family:var(--mono);font-size:11px;color:var(--fg-dim);letter-spacing:.04em}
+  footer .right{justify-self:end;display:flex;gap:24px}
+  footer .right a:hover{color:var(--fg)}
+
+  /* responsive */
+  @media (max-width:900px){
+    .meta-row{grid-template-columns:1fr;gap:8px}
+    .meta-row .r,.meta-row .c{justify-self:start}
+    .meta-strip,.impact,.closer{grid-template-columns:1fr}
+    .meta-strip > div,.impact > div,.closer > div{border-right:0;border-bottom:1px solid var(--line)}
+    .meta-strip > div:last-child,.impact > div:last-child,.closer > div:last-child{border-bottom:0}
+    .block{grid-template-columns:1fr;gap:24px;padding:60px 28px}
+    .block .side{position:static}
+    .flow{grid-template-columns:repeat(2,1fr)}
+    .step{border-bottom:1px solid var(--line)}
+    .step::after{display:none}
+    .quotes{grid-template-columns:1fr;gap:32px}
+    .pager{grid-template-columns:1fr}
+    .pager .right{text-align:left;align-items:flex-start}
+    footer{grid-template-columns:1fr;gap:8px}
+    footer .right{justify-self:start}
+    .nav .center{display:none}
+  }
+  /* highlighted pull-quote */
+  .quote.lead-quote{grid-column:1 / -1;border-top:1px solid var(--accent);padding-top:32px;margin-bottom:16px}
+  .quote.lead-quote p{font-size:clamp(40px,5vw,72px);line-height:1.02;letter-spacing:-.02em;color:var(--fg);text-wrap:balance}
+  .quote.lead-quote .n{color:var(--accent)}
+  @media (max-width:900px){
+    .quote.lead-quote{grid-column:1}
+    .quote.lead-quote p{font-size:36px}
+  }
+</style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <nav class="nav">
+    <div class="left"><span class="badge"><span class="sq"></span>CASE STUDY &middot; 02</span></div>
+    <div class="center">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#now">Now</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <div class="right"><a class="back" href="index.html"><span>&larr;</span><span>Index</span></a></div>
+  </nav>
+
+  <section class="hero">
+    <div class="meta-row">
+      <div class="l">FILE &mdash; TWK / SCALE &middot; INDEX 02</div>
+      <div class="c">CLIENT &mdash; SDAIA</div>
+      <div class="r">YEAR &mdash; 2023</div>
+    </div>
+
+    <span class="eyebrow">CASE STUDY 02 &mdash; GOVERNANCE</span>
+    <h1>Tawakkalna <em>at Scale</em></h1>
+    <p class="sub">Scaling a national super-app to 2,000+ government services.</p>
+
+    <div class="meta-strip">
+      <div><div class="k">CLIENT</div><div class="v">SDAIA <em>&middot; Saudi Data &amp; AI Authority</em></div></div>
+      <div><div class="k">ROLE</div><div class="v">UX Lead <em>&middot; IA, governance, coordination</em></div></div>
+      <div><div class="k">TEAM</div><div class="v">6 designers + 1 UX writer</div></div>
+      <div><div class="k">TIMELINE</div><div class="v">3&ndash;6 months <em>&middot; 2023</em></div></div>
+    </div>
+  </section>
+
+  <section class="lead">
+    <p>After the redesign, every major government entity in the Kingdom would plug their services into Tawakkalna. Within two years, that meant <em>2,000+ services</em> from <em>40+ entities</em> &mdash; each with different standards, naming and design maturity.</p>
+  </section>
+
+  <div class="impact">
+    <div>
+      <div class="lab">ONBOARDED</div>
+      <div class="num">2,000+</div>
+      <div class="desc">government services across the Kingdom</div>
+    </div>
+    <div class="acid">
+      <div class="lab">TRAINED</div>
+      <div class="num">40+</div>
+      <div class="desc">government entities on UX standards</div>
+    </div>
+    <div>
+      <div class="lab">SUSTAINED</div>
+      <div class="num">Top 5</div>
+      <div class="desc">DGA ranking held through scale-up</div>
+    </div>
+  </div>
+
+  <article class="block">
+    <aside class="side"><span class="num">001</span><span>Overview</span></aside>
+    <div class="body">
+      <h2>The mandate, and the risk.</h2>
+      <p>Tawakkalna's role expanded faster than its design system could keep up. After the 2.0 redesign, the mandate was clear: every major government entity in the Kingdom would plug their services into the app.</p>
+      <p>Within two years, that meant integrating <strong>2,000+ services</strong> from <strong>40+ entities</strong> &mdash; each with different content standards, naming conventions, and design maturity.</p>
+      <p>The risk wasn't that the app would fail. It was that it would slowly degrade &mdash; drowning the citizen experience under entity-driven complexity. This case study is about how UX governance, not just UX design, was used to protect a national platform at scale.</p>
+    </div>
+  </article>
+
+  <article class="block">
+    <aside class="side"><span class="num">002</span><span>The Challenge</span></aside>
+    <div class="body">
+      <h2>Scale degrades clarity &mdash; unless something protects it.</h2>
+      <p>Services arrived in uncontrolled patches from <strong>40+ government entities</strong>, each with different structures, naming conventions, and content quality.</p>
+      <p>The core risk was that scale would destroy the clarity the redesign had created. No matter how good the framework, without enforced standards the citizen experience would collapse under its own weight.</p>
+    </div>
+  </article>
+
+  <article class="block">
+    <aside class="side"><span class="num">003</span><span>The Solution</span></aside>
+    <div class="body">
+      <h2>A three-layer IA, plus a governance layer.</h2>
+      <p>I designed a 3-layer information architecture so the app could scale without losing the citizen as its centre of gravity:</p>
+      <ul class="arrows">
+        <li><strong>Search-first</strong> navigation as the primary mode. <em>Validated through competitor benchmarking and early-build usage data.</em></li>
+        <li><strong>Smart categorisation</strong> as the secondary backbone. <em>Built around citizen intent rather than entity taxonomy.</em></li>
+        <li><strong>Personalisation</strong> as the tertiary layer. <em>Surfacing what each citizen actually uses, when they use it.</em></li>
+      </ul>
+      <p style="margin-top:32px">In parallel, I created formal service-onboarding guidelines and ran structured workshops with government entity teams to set UX standards <strong>before</strong> their services went live. The governance layer was as important as the design layer.</p>
+    </div>
+  </article>
+
+  <section class="process">
+    <div class="process-head">
+      <h3>Process.</h3>
+      <span class="label">SIX STEPS &mdash; STRATEGY TO ROLLOUT</span>
+    </div>
+    <div class="flow">
+      <div class="step"><span class="n">01</span><span class="t">IA strategy</span></div>
+      <div class="step"><span class="n">02</span><span class="t">Search-first validation</span></div>
+      <div class="step"><span class="n">03</span><span class="t">Service guidelines creation</span></div>
+      <div class="step"><span class="n">04</span><span class="t">Entity workshops</span></div>
+      <div class="step"><span class="n">05</span><span class="t">Phased onboarding</span></div>
+      <div class="step"><span class="n">06</span><span class="t">Quality review</span></div>
+    </div>
+  </section>
+
+  <section class="insights">
+    <div class="insights-head">
+      <h3>Key insights.</h3>
+      <span class="label">THREE TAKEAWAYS &mdash; TWK AT SCALE</span>
+    </div>
+    <div class="quotes">
+      <div class="quote lead-quote">
+        <span class="n">&#8627; 01 &mdash; PRIMARY</span>
+        <p>At scale, governance <em style="font-style:normal;color:var(--accent)">is</em> UX.</p>
+      </div>
+      <div class="quote">
+        <span class="n">&#8627; 02</span>
+        <p>Without enforced standards, quality collapses regardless of how good the design framework is.</p>
+      </div>
+      <div class="quote">
+        <span class="n">&#8627; 03</span>
+        <p>Search-first is the right primary mode when content volume exceeds any taxonomy's ability to stay intuitive.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="closer">
+    <div>
+      <div class="k">ROLE</div>
+      <div class="v">UX Lead <em>&mdash; IA strategy, design-system governance, entity coordination, team expansion and management.</em></div>
+    </div>
+    <div>
+      <div class="k">TEAM</div>
+      <div class="v">6 full-stack designers and researchers <em>+ 1 UX writer.</em></div>
+    </div>
+    <div>
+      <div class="k">TIMELINE</div>
+      <div class="v">3&ndash;6 months <em>&mdash; phased onboarding, ongoing.</em></div>
+    </div>
+  </div>
+
+  <nav class="pager">
+    <a href="tawakkalna-2.html" class="left">
+      <span class="lab"><span class="arr">&larr;</span> PREVIOUS CASE</span>
+      <span class="ttl">Tawakkalna <em>2.0</em></span>
+    </a>
+    <a href="index.html#work" class="right">
+      <span class="lab">INDEX <span class="arr">&rarr;</span></span>
+      <span class="ttl">All <em>case studies</em></span>
+    </a>
+  </nav>
+
+  <footer>
+    <div>&copy; 2018&mdash;2026 &middot; MOHAMMAD GHAZALI</div>
+    <div style="justify-self:center">RIYADH &#8644; JEDDAH &middot; CASE STUDY 02 / 02</div>
+    <div class="right">
+      <a href="index.html">INDEX</a>
+      <a href="index.html#contact">CONTACT</a>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const dot = document.getElementById("cursorDot");
+      const ring = document.getElementById("cursorRing");
+      if (matchMedia("(pointer:coarse)").matches) return;
+      let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
+      addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; });
+      const tick = () => {
+        rx += (mx - rx) * .18; ry += (my - ry) * .18;
+        dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+        ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+        requestAnimationFrame(tick);
+      };
+      tick();
+      const setHov = (on) => ring.classList.toggle("hov", on);
+      addEventListener("mouseover", (e) => { if (e.target.closest("a")) setHov(true); });
+      addEventListener("mouseout", (e) => { if (e.target.closest("a")) setHov(false); });
+    })();
+  </script>
+</body>
+</html>

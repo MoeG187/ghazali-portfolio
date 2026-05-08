@@ -1,0 +1,116 @@
+# Case Studies — Mohammad Ghazali
+
+---
+
+## 01 — Tawakkalna 2.0
+### From COVID to a Citizen-Centered Super-App
+
+Led the full UX redesign of Saudi Arabia's national super-app, transforming it from a basic government service directory into a citizen-centered platform used by millions across the Kingdom.
+
+---
+
+### Overview
+
+Tawakkalna was born during COVID-19 as a national health-tracking app, but quickly became something far bigger: the digital front door to nearly every government service in Saudi Arabia. By 2022, it was used daily by over 26 million people for everything from permits to school records — but the experience hadn't kept up. The interface was inherited from the emergency build: structured, bureaucratic, and built around government org charts rather than the people using it.
+
+This redesign was the first major opportunity to rethink the app from the ground up — not as a service catalogue, but as a citizen-centered platform for the next decade of Saudi digital life.
+
+### The Challenge
+
+The original Tawakkalna was structured around how government entities organized their services internally — not around how citizens actually think or navigate. Users couldn't find what they needed, and the app felt like a bureaucratic index rather than a helpful digital service.
+
+### The Solution
+
+Conducted benchmarking of global super-apps to identify structural patterns. Ran rapid ideation sessions, built prototypes, and validated through 3 rounds of usability testing with real users.
+
+Two pivotal decisions emerged from research:
+
+- **National Address** was the most-accessed service and was elevated to an anchor position on the home screen.
+- Users mentally categorized their **passport** as a document, not a service, so it was moved out of Services into a dedicated Docs section.
+
+### Results & Impact
+
+- Achieved **#1 ranking** on the DGA App Maturity Index in year one
+- Has never dropped below **Top 5** since launch
+
+### Process
+
+Benchmarking & Competitive Analysis → Ideation & IA → Prototyping → Usability Testing (3 rounds) → Iteration → Launch
+
+### Key Insights
+
+- Users' mental models don't match government taxonomy
+- Navigation must be built around citizen intent, not entity structure
+- Usability testing at prototype stage — not post-launch — was the critical differentiator
+
+### My Role
+
+UX Lead — owned UX strategy, IA, interaction design, research direction, and team management
+
+### Team
+
+4 full-stack designers and researchers + 1 UX writer
+
+### Timeline
+
+3–6 months
+
+---
+---
+
+## 02 — Tawakkalna at Scale
+### Scaling a National Super-App to 2,000+ Government Services
+
+After the 2.0 redesign, led the UX strategy and governance for onboarding over 2,000 government services from dozens of entities — without breaking the experience for existing users.
+
+---
+
+### Overview
+
+Tawakkalna's role expanded faster than its design system could keep up. After the 2.0 redesign, the mandate was clear: every major government entity in the Kingdom would plug their services into the app. Within two years, that meant integrating 2,000+ services from over 40 entities — each with different content standards, naming conventions, and design maturity.
+
+The risk wasn't that the app would fail. It was that it would slowly degrade — drowning the citizen experience under entity-driven complexity. This case study is about how UX governance, not just UX design, was used to protect a national platform at scale.
+
+### The Challenge
+
+Services arrived in uncontrolled patches from 40+ government entities, each with different structures, naming conventions, and content quality. The core risk was that scale would destroy the clarity the redesign had created.
+
+### The Solution
+
+Designed a 3-layer IA system:
+
+1. **Search-first** navigation as the primary mode
+2. **Smart categorization** as the secondary backbone
+3. **Personalization** as the tertiary layer
+
+Validated the search-first direction through competitor benchmarking and early build usage data. Created formal service onboarding guidelines and ran structured workshops with government entity teams to set UX standards before their services went live.
+
+The governance layer was as important as the design layer.
+
+### Results & Impact
+
+- **2,000+ services** successfully onboarded
+- **40+ entities** trained on UX standards
+- Maintained **Top 5 DGA** App Maturity Index ranking throughout the scaling phase
+
+### Process
+
+IA Strategy → Search-First Validation → Service Guidelines Creation → Entity Workshops → Phased Onboarding → Quality Review
+
+### Key Insights
+
+- At scale, governance is UX
+- Without enforced standards, quality collapses regardless of how good the design framework is
+- Search-first navigation is the right primary mode when content volume exceeds any taxonomy's ability to stay intuitive
+
+### My Role
+
+UX Lead — IA strategy, design system governance, entity coordination, team expansion and management
+
+### Team
+
+6 full-stack designers and researchers + 1 UX writer
+
+### Timeline
+
+3–6 months
