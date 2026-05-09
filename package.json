@@ -1,0 +1,23 @@
+{
+  "name": "ghazali-portfolio",
+  "version": "1.0.0",
+  "description": "Mohammad Ghazali's portfolio website",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoeG187/ghazali-portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MoeG187/ghazali-portfolio/issues"
+  },
+  "homepage": "https://github.com/MoeG187/ghazali-portfolio#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
